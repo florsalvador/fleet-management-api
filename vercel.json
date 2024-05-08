@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "name": "fleet-management-api",
+  "builds": [
+    {
+      "src": "app/app.py",
+      "use": "@vercel/python" 
+    }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "app/app.py" }
+  ]
+}
