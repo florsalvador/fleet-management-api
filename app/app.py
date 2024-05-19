@@ -1,10 +1,10 @@
 """..."""
 from flask import Flask, request, jsonify
 from models import db, Taxis
+from config import Config
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql+psycopg2://default:Wd1enjQ2cHyL@ep-steep-paper-a4geq4k9-pooler.us-east-1.aws.neon.tech:5432/verceldb"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config.from_object(Config)
 
 db.init_app(app)
 
@@ -20,20 +20,5 @@ def get_taxis():
         taxis.append(taxi_info)
     return jsonify(taxis)
 
-
-
-# def get_taxis():
-#     """..."""
-#     page = request.args.get("page", 1, type=int)
-#     limit = request.args.get("limit", 20, type=int)
-#     taxis_pagination = session.query(Taxis).paginate(page=page, per_page=limit, error_out=False)
-#     alltaxis = []
-#     for taxi in taxis_pagination.items:
-#         taxi_info = {"id": taxi.id, "plate": taxi.plate}
-#         alltaxis.append(taxi_info)
-#     return jsonify(alltaxis)
-
-
-
-
-
+if __name__ == '__main__':
+    app.run(debug=True)

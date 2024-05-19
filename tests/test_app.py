@@ -1,6 +1,5 @@
-""""functions imported from main.py"""
+""""..."""
 # import pytest
-# from flask import request
 # from app.app import app, get_taxis
 
 
