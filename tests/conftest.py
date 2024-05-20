@@ -1,11 +1,11 @@
 """..."""
 import pytest
-from app import get_taxis
+from app.app import main
 
 @pytest.fixture()
 def app():
     """..."""
-    _app = get_taxis()
+    _app = main()
     _app.config.update({
         "TESTING": True,
     })
