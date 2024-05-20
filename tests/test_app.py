@@ -12,13 +12,13 @@ def test_get_taxis(client):
 def test_get_taxis_response(client):
     """..."""
     response = client.get("/taxis")
-    print(response.data)
     assert response.status == "200 OK"
     assert json.loads(response.get_data()) == taxis_response
 
 
 
-# NO FUNCIONA EL PATCH PARA SIMULAR LA RESPUESTA DE QUERY.PAGINATE:
+# --------NO FUNCIONA EL PATCH PARA SIMULAR LA RESPUESTA DE QUERY.PAGINATE:
+
 # from unittest.mock import patch
 # @patch("app.app.Taxis.query.paginate", name="mock_get_taxis")
 # def test_get_taxis_response(mock_get_taxis, client):
@@ -31,6 +31,7 @@ def test_get_taxis_response(client):
 
 
 # --------IVY TEST:
+
 # @patch("fleet_api.app.taxis.get",
 #        name="mock_get_taxis",
 #        return_value=TAXIS_RESPONSE)
