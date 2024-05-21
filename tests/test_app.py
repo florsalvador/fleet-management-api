@@ -1,10 +1,11 @@
 """"..."""
 import json
+# from unittest.mock import patch
 from .mock_data import taxis_response
 
 
 def test_get_taxis(client):
-    """..."""
+    """Test for get_taxis"""
     response = client.get("/taxis")
     assert response.status == "200 OK"
 
@@ -16,18 +17,34 @@ def test_get_taxis_response(client):
     assert json.loads(response.get_data()) == taxis_response
 
 
+def test_get_trajectories_by_taxi(client):
+    """..."""
+    response = client.get("/trajectories/7088")
+    assert response.status == "200 OK"
+
+
+def test_get_trajectories_with_date(client):
+    """..."""
+    response = client.get("/trajectories/7088?date=2008-02-02")
+    assert response.status == "200 OK"
+    assert len(json.loads(response.get_data())) == 135
+
 
 # --------NO FUNCIONA EL PATCH PARA SIMULAR LA RESPUESTA DE QUERY.PAGINATE:
 
-# from unittest.mock import patch
-# @patch("app.app.Taxis.query.paginate", name="mock_get_taxis")
+# @patch("app.app.Taxis.query.Paginate.items", name="mock_get_taxis")
 # def test_get_taxis_response(mock_get_taxis, client):
 #     """..."""
-#     mock_get_taxis.return_value.items = taxis_response
+#     mock_get_taxis.return_value = taxis_response
 #     response = client.get("/taxis")
-#     print(response.data)
 #     assert response.status == "200 OK"
 #     assert json.loads(response.get_data()) == taxis_response
+
+# @patch("app.app.Trajectories.query.filter", name="mock_get_trajectories", return_value=locations_by_taxi)
+
+
+
+
 
 
 # --------IVY TEST:

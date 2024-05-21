@@ -1,7 +1,7 @@
 """..."""
 from datetime import datetime
 from flask import Flask, request, jsonify
-from sqlalchemy import func, desc
+from sqlalchemy import func
 from .models import db, Taxis, Trajectories
 from .config import Config
 
@@ -11,11 +11,10 @@ def main():
     app = Flask(__name__)
     app.config.from_object(Config)
     db.init_app(app)
-    # app.app_context().push()
 
     @app.route("/taxis", methods=["GET"])
     def get_taxis():
-        """Get list of taxis"""
+        """Returns list of taxis"""
         page = request.args.get("page", 1, type=int)
         limit = request.args.get("limit", 10, type=int)
         taxis_query = Taxis.query.paginate(page=page, per_page=limit)
@@ -27,12 +26,13 @@ def main():
     
     @app.route("/trajectories/<int:taxi_id>", methods=["GET"])
     def get_trajectories(taxi_id):
-        """Get all the locations of a taxi for a specific date"""
+        """Returns all the locations of a taxi for a specific date"""
         date = request.args.get("date")
-        date_to_use = datetime.strptime(date, "%Y-%m-%d").date()
-        trajectories_query = Trajectories.query.filter(
-            Trajectories.taxi_id == taxi_id, func.date(Trajectories.date) == date_to_use
-        ).all()
+        if date:
+            date_to_use = datetime.strptime(date, "%Y-%m-%d").date()
+            trajectories_query = Trajectories.query.filter(Trajectories.taxi_id == taxi_id, func.date(Trajectories.date) == date_to_use).all()
+        else:
+            trajectories_query = Trajectories.query.filter(Trajectories.taxi_id == taxi_id).all()
         response = []
         for t in trajectories_query:
             trajectory = {
@@ -45,21 +45,21 @@ def main():
             response.append(trajectory)
         return jsonify(response)
 
-    @app.route("/last-location/latest", methods=["GET"])
-    def get_last_location(taxi_id):
-        """Get last location of every taxi"""
-        date = request.args.get("date")
-        date_to_use = datetime.strptime(date, "%Y-%m-%d").date() # No necesita date ni taxi_id, corregir
-        trajectories_query = Trajectories.query.filter(
-            Trajectories.taxi_id == taxi_id, func.date(Trajectories.date) == date_to_use
-        ).order_by(desc(Trajectories.id)).first()
-        response = {
-                "id": trajectories_query.id,
-                "taxi_id": trajectories_query.taxi_id,
-                "date": trajectories_query.date,
-                "latitude": trajectories_query.latitude,
-                "longitude": trajectories_query.longitude,
+    @app.route("/trajectories/latest", methods=["GET"])
+    def get_last_location():
+        """Returns the last location of each taxi"""
+        last_date_subquery = db.session.query(Trajectories.taxi_id, db.func.max(Trajectories.id).label("max_id")).group_by(Trajectories.taxi_id).subquery()
+        last_location_query = db.session.query(Trajectories, Taxis).join(last_date_subquery, Trajectories.id == last_date_subquery.c.max_id).join(Taxis, Trajectories.taxi_id == Taxis.id).all()
+        response = []
+        for trajectory, taxi in last_location_query:
+            last_location = {
+                "taxi_id": trajectory.taxi_id,
+                "plate": taxi.plate,
+                "date": trajectory.date,
+                "latitude": trajectory.latitude,
+                "longitude": trajectory.longitude,
             }
+            response.append(last_location)
         return jsonify(response)
 
     return app
