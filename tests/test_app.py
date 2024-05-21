@@ -30,6 +30,14 @@ def test_get_trajectories_with_date(client):
     assert len(json.loads(response.get_data())) == 135
 
 
+def test_get_last_location(client):
+    """..."""
+    response = client.get("/trajectories/latest")
+    assert response.status == "200 OK"
+    assert len(json.loads(response.get_data())) == 10
+    # assert que cada plate o taxi_id tenga un valor unico
+
+
 # --------NO FUNCIONA EL PATCH PARA SIMULAR LA RESPUESTA DE QUERY.PAGINATE:
 
 # @patch("app.app.Taxis.query.Paginate.items", name="mock_get_taxis")
