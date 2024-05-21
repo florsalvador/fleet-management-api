@@ -1,4 +1,4 @@
-"""..."""
+"""Imports"""
 from datetime import datetime
 from flask import Flask, request, jsonify
 from sqlalchemy import func
@@ -7,7 +7,7 @@ from .config import Config
 
 
 def main():
-    """..."""
+    """Creates routes"""
     app = Flask(__name__)
     app.config.from_object(Config)
     db.init_app(app)
@@ -51,7 +51,9 @@ def main():
         last_date_subquery = db.session.query(Trajectories.taxi_id, db.func.max(Trajectories.id).label("max_id")).group_by(Trajectories.taxi_id).subquery()
         last_location_query = db.session.query(Trajectories, Taxis).join(last_date_subquery, Trajectories.id == last_date_subquery.c.max_id).join(Taxis, Trajectories.taxi_id == Taxis.id).all()
         response = []
-        for trajectory, taxi in last_location_query:
+        for element in last_location_query: # element = (Trajectories(id=3, taxi_id=101, date=datetime(2008, 2, 2), latitude=40.7306, longitude=-73.9352), Taxis(id=101, plate='ABC-123'))
+            trajectory = element[0]  # Trajectories object
+            taxi = element[1]  # Taxis object
             last_location = {
                 "taxi_id": trajectory.taxi_id,
                 "plate": taxi.plate,
