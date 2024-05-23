@@ -17,7 +17,7 @@ def main():
         page = request.args.get("page", 1, type=int)
         limit = request.args.get("limit", 10, type=int)
         return select_taxis(page, limit)
-    
+
     @app.route("/trajectories", methods=["GET"])
     def get_trajectories():
         """Gets all the locations of a taxi for a specific date"""
