@@ -19,8 +19,12 @@ def select_taxis(page, limit):
 def select_trajectories(taxi_id, date):
     """Returns all the locations of a taxi for a specific date"""
     if date:
-        date_to_use = datetime.strptime(date, "%Y-%m-%d").date()
-        trajectories_query = Trajectories.query.filter(Trajectories.taxi_id == taxi_id, func.date(Trajectories.date) == date_to_use).all()
+        try:
+            date_to_use = datetime.strptime(date, "%Y-%m-%d").date()
+        except ValueError:
+            return "<h1>Error</h1><p>Date entered does not match format YYYY-MM-DD. Try again.</p>"
+        else:
+            trajectories_query = Trajectories.query.filter(Trajectories.taxi_id == taxi_id, func.date(Trajectories.date) == date_to_use).all()
     else:
         trajectories_query = Trajectories.query.filter(Trajectories.taxi_id == taxi_id).all()
     response = []
