@@ -1,6 +1,7 @@
 """..."""
 import pytest
 from app.app import main
+# from app.config import TestConfig
 
 @pytest.fixture()
 def app():
@@ -9,7 +10,8 @@ def app():
     _app.config.update({
         "TESTING": True,
     })
-    yield _app
+    with _app.app_context():
+        yield _app
 
 @pytest.fixture()
 def client(app):
