@@ -48,9 +48,9 @@ def main():
     def get_users():
         """Gets list of users"""
         page = request.args.get("page", 1, type=int)
-        limit = request.args.get("limit", 2, type=int)
+        limit = request.args.get("limit", 10, type=int)
         return select_users(page, limit)
-    
+
     # @app.route("/users/<id>", methods=["GET"])
     # def update_user(id):
     #     """Updates user's information"""
