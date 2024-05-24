@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import jsonify
 from sqlalchemy import func
 from .db import db
-from .models import Taxis, Trajectories
+from .models import Taxis, Trajectories, Users
 
 
 def select_taxis(page, limit):
@@ -23,8 +23,7 @@ def select_trajectories(taxi_id, date):
             date_to_use = datetime.strptime(date, "%Y-%m-%d").date()
         except ValueError:
             return "<h1>Error</h1><p>Date entered does not match format YYYY-MM-DD. Try again.</p>"
-        else:
-            trajectories_query = Trajectories.query.filter(Trajectories.taxi_id == taxi_id, func.date(Trajectories.date) == date_to_use).all()
+        trajectories_query = Trajectories.query.filter(Trajectories.taxi_id == taxi_id, func.date(Trajectories.date) == date_to_use).all()
     else:
         trajectories_query = Trajectories.query.filter(Trajectories.taxi_id == taxi_id).all()
     response = []
@@ -57,3 +56,40 @@ def select_last_location():
         }
         response.append(last_location)
     return jsonify(response)
+
+
+def new_user(name, email, password):
+    """"Adds new user to table Users"""
+    if not email or not password:
+        return jsonify({"error": "Email or password not provided"}), 400
+    if Users.query.filter(Users.email == email).first():
+        return jsonify({"error": "Email already exists"}), 409
+    user = Users(name, email, password)
+    user.create()
+    response = {"id": user.id, "name": user.name, "email": user.email}
+    return jsonify(response)
+
+
+def select_users(page, limit):
+    """Returns list of users"""
+    users_query = Users.query.paginate(page=page, per_page=limit)
+    response = []
+    for user in users_query.items:
+        user_info = {"id": user.id, "name": user.name, "email": user.email}
+        response.append(user_info)
+    return jsonify(response)
+
+
+# def modify_user()
+
+
+# def verify_email(email):
+#     """..."""
+#     if email[0] == "@" or email[-1] == "@" or email[0] == "." or email[-1] == ".":
+#         return False
+#     incorrect = 0
+#     for el in email:
+#         if el is not "@" or el is not ".":
+#             incorrect += 1
+#     return True
+

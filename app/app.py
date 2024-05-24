@@ -1,7 +1,7 @@
 """Imports"""
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from .db import db
-from .controllers import select_taxis, select_trajectories, select_last_location
+from .controllers import select_taxis, select_trajectories, select_last_location, new_user, select_users
 from .config import Config
 
 
@@ -29,6 +29,25 @@ def main():
     def get_last_location():
         """Gets the last location of each taxi"""
         return select_last_location()
+
+    @app.route("/users", methods=["POST"])
+    def create_user():
+        """Creates a new user"""
+        data = request.get_json()
+        try:
+            name = data["name"]
+            email = data["email"]
+            password = data["password"]
+        except KeyError:
+            return jsonify({"error": "Missing information"}), 400
+        return new_user(name, email, password)
+
+    @app.route("/users", methods=["GET"])
+    def get_users():
+        """Gets list of users"""
+        page = request.args.get("page", 1, type=int)
+        limit = request.args.get("limit", 2, type=int)
+        return select_users(page, limit)
 
     return app
 
