@@ -1,6 +1,6 @@
 """..."""
 import pytest
-from app.app import main
+from api.app import main
 # from app.config import TestConfig
 
 @pytest.fixture()

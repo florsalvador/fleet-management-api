@@ -1,7 +1,9 @@
 """Imports"""
 from flask import Flask, request, jsonify
-from .db import db
-from .controllers import select_taxis, select_trajectories, select_last_location, new_user, select_users
+from db.db import db
+from controllers.taxis_controller import select_taxis
+from controllers.trajectories_controller import select_trajectories, select_last_location
+from controllers.users_controller import new_user, select_users
 from .config import Config
 
 
@@ -48,6 +50,10 @@ def main():
         page = request.args.get("page", 1, type=int)
         limit = request.args.get("limit", 2, type=int)
         return select_users(page, limit)
+    
+    # @app.route("/users/<id>", methods=["GET"])
+    # def update_user(id):
+    #     """Updates user's information"""
 
     return app
 

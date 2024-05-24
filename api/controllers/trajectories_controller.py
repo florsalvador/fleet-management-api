@@ -2,19 +2,9 @@
 from datetime import datetime
 from flask import jsonify
 from sqlalchemy import func
-from .db import db
-from .models import Taxis, Trajectories, Users
-
-
-def select_taxis(page, limit):
-    """Returns list of taxis"""
-    taxis_query = Taxis.query.paginate(page=page, per_page=limit)
-    response = []
-    for taxi in taxis_query.items:
-        taxi_info = {"id": taxi.id, "plate": taxi.plate}
-        response.append(taxi_info)
-    return jsonify(response)
-
+from db.db import db
+from models.taxis import Taxis
+from models.trajectories import Trajectories
 
 def select_trajectories(taxi_id, date):
     """Returns all the locations of a taxi for a specific date"""
@@ -56,40 +46,3 @@ def select_last_location():
         }
         response.append(last_location)
     return jsonify(response)
-
-
-def new_user(name, email, password):
-    """"Adds new user to table Users"""
-    if not email or not password:
-        return jsonify({"error": "Email or password not provided"}), 400
-    if Users.query.filter(Users.email == email).first():
-        return jsonify({"error": "Email already exists"}), 409
-    user = Users(name, email, password)
-    user.create()
-    response = {"id": user.id, "name": user.name, "email": user.email}
-    return jsonify(response)
-
-
-def select_users(page, limit):
-    """Returns list of users"""
-    users_query = Users.query.paginate(page=page, per_page=limit)
-    response = []
-    for user in users_query.items:
-        user_info = {"id": user.id, "name": user.name, "email": user.email}
-        response.append(user_info)
-    return jsonify(response)
-
-
-# def modify_user()
-
-
-# def verify_email(email):
-#     """..."""
-#     if email[0] == "@" or email[-1] == "@" or email[0] == "." or email[-1] == ".":
-#         return False
-#     incorrect = 0
-#     for el in email:
-#         if el is not "@" or el is not ".":
-#             incorrect += 1
-#     return True
-
