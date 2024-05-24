@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from api.db.db import db
 from api.controllers.taxis_controller import select_taxis
 from api.controllers.trajectories_controller import select_trajectories, select_last_location
-from api.controllers.users_controller import new_user, select_users
+from api.controllers.users_controller import new_user, select_users, modify_user
 from .config import Config
 
 
@@ -48,12 +48,23 @@ def main():
     def get_users():
         """Gets list of users"""
         page = request.args.get("page", 1, type=int)
-        limit = request.args.get("limit", 2, type=int)
+        limit = request.args.get("limit", 10, type=int)
         return select_users(page, limit)
-    
-    # @app.route("/users/<id>", methods=["GET"])
-    # def update_user(id):
-    #     """Updates user's information"""
+
+    @app.route("/users/<id>", methods=["PATCH"])
+    def update_user(user_id):
+        """Updates user's information"""
+        data = request.get_json()
+        return modify_user(user_id, data)
+
+    # @app.route('/users/<id>', methods=['DELETE'])
+    # def delete_user(id):
+    #     """Deletes user"""
+    #     user = User.query.filter_by(id=id).first()
+    #     if user is None:
+    #         return jsonify({'message': 'User does not exists'}), 404
+    #     user.delete()
+    #     return jsonify({'user': user.json() })
 
     return app
 

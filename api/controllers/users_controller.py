@@ -24,4 +24,6 @@ def select_users(page, limit):
     return jsonify(response)
 
 
-# def modify_user()
+def modify_user(user_id, data):
+    """Modifies user's information and returns the new data"""
+
