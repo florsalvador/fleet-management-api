@@ -1,4 +1,5 @@
-from db.db import db
+"""..."""
+from api.db.db import db
 
 
 class Trajectories(db.Model):

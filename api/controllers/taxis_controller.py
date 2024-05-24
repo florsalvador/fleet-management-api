@@ -1,6 +1,6 @@
 """..."""
 from flask import jsonify
-from models.taxis import Taxis
+from api.models.taxis import Taxis
 
 
 def select_taxis(page, limit):

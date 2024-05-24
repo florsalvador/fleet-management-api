@@ -4,7 +4,7 @@ from unittest.mock import patch
 from .mock_data import taxis_response, locations_response, last_location_response
 
 
-@patch("app.app.select_taxis",
+@patch("api.app.select_taxis",
        name="mock_select_taxis",
        return_value=taxis_response)
 def test_get_taxis_response(mock_select_taxis, client):
@@ -15,7 +15,7 @@ def test_get_taxis_response(mock_select_taxis, client):
     assert json.loads(response.get_data()) == taxis_response
 
 
-@patch("app.app.select_trajectories",
+@patch("api.app.select_trajectories",
        name="mock_select_trajectories",
        return_value=locations_response)
 def test_get_trajectories_by_taxi(mock_select_trajectories, client):
@@ -26,7 +26,7 @@ def test_get_trajectories_by_taxi(mock_select_trajectories, client):
     assert json.loads(response.get_data()) == locations_response
 
 
-@patch("app.app.select_trajectories",
+@patch("api.app.select_trajectories",
        name="mock_select_trajectories",
        return_value=locations_response)
 def test_get_trajectories_with_date(mock_select_trajectories, client):
@@ -37,7 +37,7 @@ def test_get_trajectories_with_date(mock_select_trajectories, client):
     assert len(json.loads(response.get_data())) == 3
 
 
-@patch("app.app.select_last_location",
+@patch("api.app.select_last_location",
        name="mock_select_last_location",
        return_value=last_location_response)
 def test_get_last_location(mock_select_last_location, client):

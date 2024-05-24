@@ -2,9 +2,9 @@
 from datetime import datetime
 from flask import jsonify
 from sqlalchemy import func
-from db.db import db
-from models.taxis import Taxis
-from models.trajectories import Trajectories
+from api.db.db import db
+from api.models.taxis import Taxis
+from api.models.trajectories import Trajectories
 
 def select_trajectories(taxi_id, date):
     """Returns all the locations of a taxi for a specific date"""

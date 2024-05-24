@@ -1,7 +1,6 @@
 """..."""
 from flask import jsonify
-from db.db import db
-from models.users import Users
+from api.models.users import Users
 
 def new_user(name, email, password):
     """"Adds new user to table Users"""

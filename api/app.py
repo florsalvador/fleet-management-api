@@ -1,9 +1,9 @@
 """Imports"""
 from flask import Flask, request, jsonify
-from db.db import db
-from controllers.taxis_controller import select_taxis
-from controllers.trajectories_controller import select_trajectories, select_last_location
-from controllers.users_controller import new_user, select_users
+from api.db.db import db
+from api.controllers.taxis_controller import select_taxis
+from api.controllers.trajectories_controller import select_trajectories, select_last_location
+from api.controllers.users_controller import new_user, select_users
 from .config import Config
 
 
