@@ -51,20 +51,11 @@ def main():
         limit = request.args.get("limit", 10, type=int)
         return select_users(page, limit)
 
-    @app.route("/users/<id>", methods=["PATCH"])
+    @app.route("/users/<int:user_id>", methods=["PATCH"])
     def update_user(user_id):
         """Updates user's information"""
         data = request.get_json()
         return modify_user(user_id, data)
-
-    # @app.route('/users/<id>', methods=['DELETE'])
-    # def delete_user(id):
-    #     """Deletes user"""
-    #     user = User.query.filter_by(id=id).first()
-    #     if user is None:
-    #         return jsonify({'message': 'User does not exists'}), 404
-    #     user.delete()
-    #     return jsonify({'user': user.json() })
 
     return app
 

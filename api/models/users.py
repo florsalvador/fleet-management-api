@@ -20,3 +20,7 @@ class Users(db.Model):
         """Adds new user to table"""
         db.session.add(self)
         db.session.commit()
+
+    def update(self):
+        """Updates table"""
+        db.session.commit()
