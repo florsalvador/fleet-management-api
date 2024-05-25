@@ -24,3 +24,8 @@ class Users(db.Model):
     def update(self):
         """Updates table"""
         db.session.commit()
+
+    def delete(self):
+        """Deletes user from table"""
+        db.session.delete(self)
+        db.session.commit()

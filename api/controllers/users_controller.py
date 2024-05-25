@@ -27,9 +27,9 @@ def select_users(page, limit):
 
 def modify_user(user_id, data):
     """Modifies user's information and returns the new data"""
-    if not Users.query.filter(Users.id == user_id).first():
-        return jsonify({"error": "User does not exist"}), 404
     user = Users.query.filter(Users.id == user_id).first()
+    if not user:
+        return jsonify({"error": "User does not exist"}), 404
     if "name" in data:
         user.name = data["name"]
     if "email" in data:
@@ -38,4 +38,14 @@ def modify_user(user_id, data):
         user.password = data["password"]
     user.update()
     response = {"id": user.id, "name": user.name, "email": user.email}
+    return jsonify(response)
+
+
+def delete_user(user_id):
+    """Deletes user and returns deleted user's information"""
+    user = Users.query.filter(Users.id == user_id).first()
+    if not user:
+        return jsonify({"error": "User does not exist"}), 404
+    response = {"id": user.id, "name": user.name, "email": user.email}
+    user.delete()
     return jsonify(response)

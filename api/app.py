@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from api.db.db import db
 from api.controllers.taxis_controller import select_taxis
 from api.controllers.trajectories_controller import select_trajectories, select_last_location
-from api.controllers.users_controller import new_user, select_users, modify_user
+from api.controllers.users_controller import new_user, select_users, modify_user, delete_user
 from .config import Config
 
 
@@ -56,6 +56,11 @@ def main():
         """Updates user's information"""
         data = request.get_json()
         return modify_user(user_id, data)
+
+    @app.route('/users/<user_id>', methods=['DELETE'])
+    def delete_by_id(user_id):
+        """Deletes user"""
+        return delete_user(user_id)
 
     return app
 
