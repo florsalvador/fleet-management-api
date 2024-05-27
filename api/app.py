@@ -1,4 +1,5 @@
-"""Imports"""
+"""Routes"""
+
 from flask import Flask, request, jsonify
 from api.db.db import db
 from api.controllers.taxis_controller import select_taxis
@@ -27,10 +28,11 @@ def main():
         date = request.args.get("date")
         return select_trajectories(taxi_id, date)
 
-    @app.route("/trajectories/latest", methods=["GET"])
-    def get_last_location():
-        """Gets the last location of each taxi"""
-        return select_last_location()
+    app.add_url_rule("/trajectories/latest", view_func=select_last_location)
+    # @app.route("/trajectories/latest", methods=["GET"])
+    # def get_last_location():
+    #     """Gets the last location of each taxi"""
+    #     return select_last_location()
 
     @app.route("/users", methods=["POST"])
     def create_user():
@@ -42,7 +44,8 @@ def main():
             password = data["password"]
         except KeyError:
             return jsonify({"error": "Missing information"}), 400
-        return new_user(name, email, password)
+        role = "user" if not "role" in data else data["role"]
+        return new_user(name, email, password, role)
 
     @app.route("/users", methods=["GET"])
     def get_users():

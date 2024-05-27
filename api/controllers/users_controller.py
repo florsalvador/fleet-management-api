@@ -1,15 +1,16 @@
-"""..."""
+"""Module controller for table users"""
+
 from flask import jsonify
 from api.models.users import Users
 
 
-def new_user(name, email, password):
+def new_user(name, email, password, role):
     """"Adds new user to table users and returns user's information"""
     if not email or not password:
         return jsonify({"error": "Email or password not provided"}), 400
     if Users.query.filter(Users.email == email).first():
         return jsonify({"error": "Email already exists"}), 409
-    user = Users(name, email, password)
+    user = Users(name, email, password, role)
     user.create()
     response = {"id": user.id, "name": user.name, "email": user.email}
     return jsonify(response)

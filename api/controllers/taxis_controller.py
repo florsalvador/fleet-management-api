@@ -1,4 +1,5 @@
-"""..."""
+"""Module controller for table taxis"""
+
 from flask import jsonify
 from api.models.taxis import Taxis
 

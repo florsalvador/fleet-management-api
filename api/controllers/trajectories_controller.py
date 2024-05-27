@@ -1,4 +1,5 @@
-"""..."""
+"""Module controller for table trajectories"""
+
 from datetime import datetime
 from flask import jsonify
 from sqlalchemy import func

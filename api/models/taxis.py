@@ -1,4 +1,5 @@
-"""..."""
+"""Model for table taxis"""
+
 from api.db.db import db
 
 

@@ -1,9 +1,10 @@
-"""..."""
+"""Model for table trajectories"""
+
 from api.db.db import db
 
 
 class Trajectories(db.Model):
-    """Class for table Trajectories"""
+    """Class for table trajectories"""
     __tablename__ = "trajectories"
 
     id = db.Column(db.Integer, primary_key=True)

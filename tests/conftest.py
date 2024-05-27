@@ -1,4 +1,5 @@
-"""..."""
+"""Module conftest"""
+
 import pytest
 from api.app import main
 
