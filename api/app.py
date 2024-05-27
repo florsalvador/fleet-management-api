@@ -57,7 +57,7 @@ def main():
         data = request.get_json()
         return modify_user(user_id, data)
 
-    @app.route('/users/<user_id>', methods=['DELETE'])
+    @app.route('/users/<int:user_id>', methods=['DELETE'])
     def delete_by_id(user_id):
         """Deletes user"""
         return delete_user(user_id)
