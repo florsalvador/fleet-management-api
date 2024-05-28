@@ -1,10 +1,12 @@
 """Routes"""
 
 from flask import Flask, request, jsonify
+from flask_jwt_extended import JWTManager
 from api.db.db import db
 from api.controllers.taxis_controller import select_taxis
 from api.controllers.trajectories_controller import select_trajectories, select_last_location
 from api.controllers.users_controller import new_user, select_users, modify_user, delete_user
+from api.controllers.authentication import create_token
 from .config import Config
 
 
@@ -13,6 +15,9 @@ def main():
     app = Flask(__name__)
     app.config.from_object(Config)
     db.init_app(app)
+
+    app.config["JWT_SECRET_KEY"] = "ansfalfgnlkn4636" # Change
+    jwt = JWTManager(app)
 
     @app.route("/taxis", methods=["GET"])
     def get_taxis():
@@ -28,11 +33,10 @@ def main():
         date = request.args.get("date")
         return select_trajectories(taxi_id, date)
 
-    app.add_url_rule("/trajectories/latest", view_func=select_last_location)
-    # @app.route("/trajectories/latest", methods=["GET"])
-    # def get_last_location():
-    #     """Gets the last location of each taxi"""
-    #     return select_last_location()
+    @app.route("/trajectories/latest", methods=["GET"])
+    def get_last_location():
+        """Gets the last location of each taxi"""
+        return select_last_location()
 
     @app.route("/users", methods=["POST"])
     def create_user():
@@ -60,10 +64,21 @@ def main():
         data = request.get_json()
         return modify_user(user_id, data)
 
-    @app.route('/users/<int:user_id>', methods=['DELETE'])
+    @app.route("/users/<int:user_id>", methods=["DELETE"])
     def delete_by_id(user_id):
         """Deletes user"""
         return delete_user(user_id)
+
+    @app.route("/auth/login", methods=["POST"])
+    def get_token():
+        """Gets authentication token"""
+        data = request.get_json()
+        try:
+            email = data["email"]
+            password = data["password"]
+        except KeyError:
+            return jsonify({"error": "Missing information"}), 400
+        return create_token(email, password)
 
     return app
 
