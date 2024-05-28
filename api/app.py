@@ -1,7 +1,8 @@
 """Routes"""
 
 from flask import Flask, request, jsonify
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
+from datetime import timedelta
 from api.db.db import db
 from api.controllers.taxis_controller import select_taxis
 from api.controllers.trajectories_controller import select_trajectories, select_last_location
@@ -17,6 +18,7 @@ def main():
     db.init_app(app)
 
     app.config["JWT_SECRET_KEY"] = "ansfalfgnlkn4636" # Change
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
     jwt = JWTManager(app)
 
     @app.route("/taxis", methods=["GET"])
@@ -51,23 +53,25 @@ def main():
         role = "user" if not "role" in data else data["role"]
         return new_user(name, email, password, role)
 
-    @app.route("/users", methods=["GET"])
+    @app.route("/users", methods=["GET"]) # PROTECTED ENDPOINT
+    # @jwt_required()
     def get_users():
         """Gets list of users"""
+        # current_user = get_jwt_identity()
         page = request.args.get("page", 1, type=int)
         limit = request.args.get("limit", 10, type=int)
         return select_users(page, limit)
 
-    @app.route("/users/<int:user_id>", methods=["PATCH"])
-    def update_user(user_id):
+    @app.route("/users/<uid>", methods=["PATCH"])
+    def update_user(uid):
         """Updates user's information"""
         data = request.get_json()
-        return modify_user(user_id, data)
+        return modify_user(uid, data)
 
-    @app.route("/users/<int:user_id>", methods=["DELETE"])
-    def delete_by_id(user_id):
+    @app.route("/users/<uid>", methods=["DELETE"])
+    def delete_by_id(uid):
         """Deletes user"""
-        return delete_user(user_id)
+        return delete_user(uid)
 
     @app.route("/auth/login", methods=["POST"])
     def get_token():

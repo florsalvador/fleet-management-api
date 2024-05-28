@@ -26,9 +26,12 @@ def select_users(page, limit):
     return jsonify(response)
 
 
-def modify_user(user_id, data):
+def modify_user(uid, data):
     """Modifies user's information and returns the new data"""
-    user = Users.query.filter(Users.id == user_id).first()
+    if "@" in uid:
+        user = Users.query.filter(Users.email == uid).first()
+    else:
+        user = Users.query.filter(Users.id == uid).first()
     if not user:
         return jsonify({"error": "User does not exist"}), 404
     if "name" in data:
@@ -42,9 +45,12 @@ def modify_user(user_id, data):
     return jsonify(response)
 
 
-def delete_user(user_id):
+def delete_user(uid):
     """Deletes user and returns deleted user's information"""
-    user = Users.query.filter(Users.id == user_id).first()
+    if "@" in uid:
+        user = Users.query.filter(Users.email == uid).first()
+    else:
+        user = Users.query.filter(Users.id == uid).first()
     if not user:
         return jsonify({"error": "User does not exist"}), 404
     response = {"id": user.id, "name": user.name, "email": user.email}
