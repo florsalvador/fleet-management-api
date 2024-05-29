@@ -2,7 +2,6 @@
 
 from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
-# from datetime import timedelta
 from api.db.db import db
 from api.controllers.taxis_controller import select_taxis
 from api.controllers.trajectories_controller import select_trajectories, select_last_location
@@ -15,13 +14,12 @@ from .config import Config
 def main():
     """Creates routes"""
     app = Flask(__name__)
-    # bcrypt = Bcrypt(app)
-    bcrypt.init_app(app)  # Inicializar bcrypt con la aplicación
     app.config.from_object(Config)
+
     db.init_app(app)
-    app.config["JWT_SECRET_KEY"] = "ansfalfgnlkn4636" # Change
-    # app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
+    bcrypt.init_app(app) # Inicializa bcrypt con la aplicación (antes era bcrypt = Bcrypt(app))
     jwt = JWTManager(app)
+
     @app.route("/taxis", methods=["GET"])
     def get_taxis():
         """Gets list of taxis"""
@@ -36,9 +34,11 @@ def main():
         date = request.args.get("date")
         return select_trajectories(taxi_id, date)
 
-    @app.route("/trajectories/latest", methods=["GET"])
+    @app.route("/trajectories/latest", methods=["GET"]) # PROTECTED ENDPOINT
+    # @jwt_required()
     def get_last_location():
         """Gets the last location of each taxi"""
+        # current_user = get_jwt_identity()
         return select_last_location()
 
     @app.route("/users", methods=["POST"])
@@ -54,11 +54,9 @@ def main():
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         return new_user(name, email, hashed_password)
 
-    @app.route("/users", methods=["GET"]) # PROTECTED ENDPOINT
-    # @jwt_required()
+    @app.route("/users", methods=["GET"])
     def get_users():
         """Gets list of users"""
-        # current_user = get_jwt_identity()
         page = request.args.get("page", 1, type=int)
         limit = request.args.get("limit", 10, type=int)
         return select_users(page, limit)

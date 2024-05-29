@@ -78,3 +78,9 @@ update_user_response = {
   "name": "Grace Hopper",
   "email": "grace.hopper@email.com"
 }
+
+
+create_token_response = {
+  "accessToken": "access_token",
+  "user": {"id": 15253, "email": "anita.borg@systers.xyz"}
+}

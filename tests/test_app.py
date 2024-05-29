@@ -8,7 +8,8 @@ from .mock_data import (
     last_location_response,
     new_user_response,
     users_response,
-    update_user_response
+    update_user_response,
+    create_token_response
 )
 
 
@@ -73,7 +74,6 @@ def test_create_user(mock_new_user, client):
     assert json.loads(response.get_data()) == new_user_response
 
 
-# @patch("api.app.new_user", name="mock_new_user", return_value=new_user_response)
 def test_create_user_error(client):
     """Test for create_user to verify name, email and password are present in the request body"""
     response = client.post(
@@ -84,7 +84,6 @@ def test_create_user_error(client):
         }
     )
     assert response.status_code == 400
-    # assert mock_new_user.called
 
 
 @patch("api.app.select_users", name="mock_select_users", return_value=users_response)
@@ -115,3 +114,29 @@ def test_delete_by_id(mock_delete_user, client):
     response = client.delete("/users/15254")
     assert response.status_code == 200
     assert mock_delete_user.called
+
+
+@patch("api.app.create_token", name="mock_create_token", return_value=create_token_response)
+def test_get_token(mock_create_token, client):
+    """Test for get_token"""
+    response = client.post(
+        "/auth/login",
+        json={
+            "email": "anita.borg@systers.xyz",
+            "password": "XLqVhq3vw9yj"
+        }
+    )
+    assert response.status_code == 200
+    assert mock_create_token.called
+    assert json.loads(response.get_data()) == create_token_response
+
+
+def test_get_token_error(client):
+    """Test for get_token to verify that both email and password are present in the request body"""
+    response = client.post(
+        "/auth/login",
+        json={
+            "email": "anita.borg@systers.xyz"
+        }
+    )
+    assert response.status_code == 400

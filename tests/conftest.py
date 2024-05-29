@@ -5,7 +5,7 @@ from api.app import main
 
 @pytest.fixture()
 def app():
-    """..."""
+    """Fixture for app"""
     _app = main()
     _app.config.update({
         "TESTING": True,
@@ -15,5 +15,5 @@ def app():
 
 @pytest.fixture()
 def client(app):
-    """..."""
+    """Fixture for client"""
     return app.test_client()
