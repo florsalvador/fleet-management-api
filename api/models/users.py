@@ -11,13 +11,11 @@ class Users(db.Model):
     name = db.Column(db.String())
     email = db.Column(db.String())
     password = db.Column(db.String())
-    role = db.Column(db.String())
 
-    def __init__(self, name, email, password, role):
+    def __init__(self, name, email, password):
         self.name = name
         self.email = email
         self.password = password
-        self.role = role
 
     def create(self):
         """Adds new user to table"""

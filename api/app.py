@@ -2,25 +2,26 @@
 
 from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
-from datetime import timedelta
+# from datetime import timedelta
 from api.db.db import db
 from api.controllers.taxis_controller import select_taxis
 from api.controllers.trajectories_controller import select_trajectories, select_last_location
 from api.controllers.users_controller import new_user, select_users, modify_user, delete_user
-from api.controllers.authentication import create_token
+from api.controllers.login import create_token
+from .extensions import bcrypt
 from .config import Config
 
 
 def main():
     """Creates routes"""
     app = Flask(__name__)
+    # bcrypt = Bcrypt(app)
+    bcrypt.init_app(app)  # Inicializar bcrypt con la aplicación
     app.config.from_object(Config)
     db.init_app(app)
-
     app.config["JWT_SECRET_KEY"] = "ansfalfgnlkn4636" # Change
-    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
+    # app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
     jwt = JWTManager(app)
-
     @app.route("/taxis", methods=["GET"])
     def get_taxis():
         """Gets list of taxis"""
@@ -50,8 +51,8 @@ def main():
             password = data["password"]
         except KeyError:
             return jsonify({"error": "Missing information"}), 400
-        role = "user" if not "role" in data else data["role"]
-        return new_user(name, email, password, role)
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        return new_user(name, email, hashed_password)
 
     @app.route("/users", methods=["GET"]) # PROTECTED ENDPOINT
     # @jwt_required()
