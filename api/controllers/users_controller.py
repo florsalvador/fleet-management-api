@@ -27,23 +27,22 @@ def select_users(page, limit):
     return jsonify(response)
 
 
-def modify_user(uid, data):
+def modify_user(uid, current_user, data):
     """Modifies user's information and returns the new data"""
-    if "@" in uid:
-        user = Users.query.filter(Users.email == uid).first()
-    else:
-        user = Users.query.filter(Users.id == uid).first()
+    user = Users.query.filter((Users.email if "@" in uid else Users.id) == uid).first()
     if not user:
         return jsonify({"error": "User does not exist"}), 404
-    if "name" in data:
-        user.name = data["name"]
-    if "email" in data:
-        user.email = data["email"]
-    if "password" in data:
-        user.password = bcrypt.generate_password_hash(data["password"]).decode('utf-8')
-    user.update()
-    response = {"id": user.id, "name": user.name, "email": user.email}
-    return jsonify(response)
+    if current_user == user.id:
+        if "name" in data:
+            user.name = data["name"]
+        if "email" in data:
+            user.email = data["email"]
+        if "password" in data:
+            user.password = bcrypt.generate_password_hash(data["password"]).decode('utf-8')
+        user.update()
+        response = {"id": user.id, "name": user.name, "email": user.email}
+        return jsonify(response)
+    return jsonify({"error": "Only the user can modify their own data"}), 400
 
 
 def delete_user(uid):

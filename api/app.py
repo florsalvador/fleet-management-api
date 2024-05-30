@@ -18,6 +18,7 @@ def main():
 
     db.init_app(app)
     bcrypt.init_app(app) # Inicializa bcrypt con la aplicación (antes era bcrypt = Bcrypt(app))
+
     jwt = JWTManager(app)
 
     @app.route("/taxis", methods=["GET"])
@@ -68,8 +69,9 @@ def main():
     @jwt_required()
     def update_user(uid):
         """Updates user's information"""
+        current_user = get_jwt_identity()
         data = request.get_json()
-        return modify_user(uid, data)
+        return modify_user(uid, current_user, data)
 
     @app.route("/users/<uid>", methods=["DELETE"])
     @jwt_required()
