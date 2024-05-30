@@ -3,6 +3,7 @@
 import pytest
 from api.app import main
 
+
 @pytest.fixture()
 def app():
     """Fixture for app"""
@@ -13,6 +14,8 @@ def app():
     with _app.app_context():
         yield _app
 
+
+# pylint: disable=redefined-outer-name
 @pytest.fixture()
 def client(app):
     """Fixture for client"""

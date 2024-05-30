@@ -17,8 +17,8 @@ def main():
     app.config.from_object(Config)
 
     db.init_app(app)
-    bcrypt.init_app(app) # Inicializa bcrypt con la aplicación (antes era bcrypt = Bcrypt(app))
-
+    bcrypt.init_app(app) # Initializes bcrypt with the application (before: bcrypt = Bcrypt(app))
+    # pylint: disable=unused-variable
     jwt = JWTManager(app)
 
     @app.route("/taxis", methods=["GET"])
