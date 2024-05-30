@@ -21,6 +21,7 @@ def main():
     jwt = JWTManager(app)
 
     @app.route("/taxis", methods=["GET"])
+    @jwt_required()
     def get_taxis():
         """Gets list of taxis"""
         page = request.args.get("page", 1, type=int)
@@ -28,20 +29,21 @@ def main():
         return select_taxis(page, limit)
 
     @app.route("/trajectories", methods=["GET"])
+    @jwt_required()
     def get_trajectories():
         """Gets all the locations of a taxi for a specific date"""
         taxi_id = request.args.get("taxiId")
         date = request.args.get("date")
         return select_trajectories(taxi_id, date)
 
-    @app.route("/trajectories/latest", methods=["GET"]) # PROTECTED ENDPOINT
-    # @jwt_required()
+    @app.route("/trajectories/latest", methods=["GET"])
+    @jwt_required()
     def get_last_location():
         """Gets the last location of each taxi"""
-        # current_user = get_jwt_identity()
         return select_last_location()
 
     @app.route("/users", methods=["POST"])
+    @jwt_required()
     def create_user():
         """Creates a new user"""
         data = request.get_json()
@@ -55,6 +57,7 @@ def main():
         return new_user(name, email, hashed_password)
 
     @app.route("/users", methods=["GET"])
+    @jwt_required()
     def get_users():
         """Gets list of users"""
         page = request.args.get("page", 1, type=int)
@@ -62,12 +65,14 @@ def main():
         return select_users(page, limit)
 
     @app.route("/users/<uid>", methods=["PATCH"])
+    @jwt_required()
     def update_user(uid):
         """Updates user's information"""
         data = request.get_json()
         return modify_user(uid, data)
 
     @app.route("/users/<uid>", methods=["DELETE"])
+    @jwt_required()
     def delete_by_id(uid):
         """Deletes user"""
         return delete_user(uid)

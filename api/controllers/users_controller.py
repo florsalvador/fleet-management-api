@@ -6,7 +6,7 @@ from api.extensions import bcrypt
 
 
 def new_user(name, email, password):
-    """"Adds new user to table users and returns user's information"""
+    """Adds new user to table users and returns user's information"""
     if not email or not password:
         return jsonify({"error": "Email or password not provided"}), 400
     if Users.query.filter(Users.email == email).first():
