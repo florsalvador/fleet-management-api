@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from api.db.db import db
 from api.controllers.taxis_controller import select_taxis
-from api.controllers.trajectories_controller import select_trajectories, select_last_location
+from api.controllers.trajectories_controller import select_trajectories, select_last_location, get_excel
 from api.controllers.users_controller import new_user, select_users, modify_user, delete_user
 from api.controllers.login import create_token
 from .extensions import bcrypt
@@ -77,7 +77,8 @@ def main():
     @jwt_required()
     def delete_by_id(uid):
         """Deletes user"""
-        return delete_user(uid)
+        current_user = get_jwt_identity()
+        return delete_user(uid, current_user)
 
     @app.route("/auth/login", methods=["POST"])
     def get_token():
@@ -89,6 +90,14 @@ def main():
         except KeyError:
             return jsonify({"error": "Missing information"}), 400
         return create_token(email, password)
+
+    @app.route("/trajectories/export", methods=["GET"])
+    def export_trajectories():
+        """Gets excel"""
+        taxi_id = request.args.get("taxiId")
+        date = request.args.get("date")
+        # email = request.args.get("email")
+        return get_excel(taxi_id, date)
 
     return app
 

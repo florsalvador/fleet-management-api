@@ -45,7 +45,7 @@ def modify_user(uid, current_user, data):
     return jsonify({"error": "Only the user can modify their own data"}), 400
 
 
-def delete_user(uid):
+def delete_user(uid, current_user):
     """Deletes user and returns deleted user's information"""
     if "@" in uid:
         user = Users.query.filter(Users.email == uid).first()
@@ -53,6 +53,8 @@ def delete_user(uid):
         user = Users.query.filter(Users.id == uid).first()
     if not user:
         return jsonify({"error": "User does not exist"}), 404
-    response = {"id": user.id, "name": user.name, "email": user.email}
-    user.delete()
-    return jsonify(response)
+    if current_user == user.id:
+        response = {"id": user.id, "name": user.name, "email": user.email}
+        user.delete()
+        return jsonify(response)
+    return jsonify({"error": "Only the user can delete their own profile"}), 400

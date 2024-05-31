@@ -1,7 +1,6 @@
 """Tests for app.py"""
 
 import json
-# from functools import wraps
 from unittest.mock import patch
 from .mock_data import (
     taxis_response,

@@ -1,8 +1,10 @@
 """Module controller for table trajectories"""
-
+# import sys
 from datetime import datetime
-from flask import jsonify
+import io
+from flask import jsonify, send_file
 from sqlalchemy import func
+from openpyxl import Workbook
 from api.db.db import db
 from api.models.taxis import Taxis
 from api.models.trajectories import Trajectories
@@ -48,3 +50,42 @@ def select_last_location():
         }
         response.append(last_location)
     return jsonify(response)
+
+
+# def list_to_xlsx(lst):
+#     """Converts list to xlsx file"""
+
+
+def get_excel(taxi_id, date):
+    """Sends excel file with all the locations of a taxi for a specific date"""
+    try:
+        date_to_use = datetime.strptime(date, "%Y-%m-%d").date()
+    except ValueError:
+        return "<h1>Error</h1><p>Date entered does not match format YYYY-MM-DD. Try again.</p>"
+    trajectories_query = db.session.query(Trajectories, Taxis).filter(Trajectories.taxi_id == taxi_id, func.date(Trajectories.date) == date_to_use).join(Taxis, Trajectories.taxi_id == Taxis.id).all()
+    response = []
+    for element in trajectories_query:
+        trajectory = element[0]  # Trajectories object
+        taxi = element[1]  # Taxis object
+        locations = {
+            "taxi_id": trajectory.taxi_id,
+            "plate": taxi.plate,
+            "latitude": trajectory.latitude,
+            "longitude": trajectory.longitude,
+            "date": trajectory.date
+        }
+        response.append(locations)
+    # print(response, file=sys.stderr)
+    wb = Workbook()
+    ws = wb.active
+    row_1 = ["taxi_id", "plate", "latitude", "longitude", "date"]
+    ws.append(row_1)
+    for r in response:
+        row = list(r.values())
+        ws.append(row)
+    # Save the file to an in-memory buffer
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    file_name = f"locations-{taxi_id}-{date}.xlsx"
+    return send_file(output, as_attachment=True, download_name=file_name, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
