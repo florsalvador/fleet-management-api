@@ -1,18 +1,19 @@
 """Routes"""
 
-import io
-# import json
 from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
-from flask_mail import Mail, Message
-from openpyxl import Workbook
 from api.db.db import db
 from api.controllers.taxis_controller import select_taxis
-from api.controllers.trajectories_controller import select_trajectories, select_last_location, trajectories_with_plate
+from api.controllers.trajectories_controller import (
+    select_trajectories,
+    select_last_location,
+    trajectories_with_plate,
+)
 from api.controllers.users_controller import new_user, select_users, modify_user, delete_user
 from api.controllers.login import create_token
-from .extensions import bcrypt
 from .config import Config
+from .extensions import bcrypt, mail
+from .utils import list_to_excel, send_excel_email
 
 
 def main():
@@ -21,10 +22,10 @@ def main():
     app.config.from_object(Config)
 
     db.init_app(app)
-    bcrypt.init_app(app) # Initializes bcrypt with the application (before: bcrypt = Bcrypt(app))
+    bcrypt.init_app(app) # Initializes bcrypt (before: bcrypt = Bcrypt(app))
+    mail.init_app(app) # Initializes flask-mail
     # pylint: disable=unused-variable
     jwt = JWTManager(app)
-    mail = Mail(app)
 
     @app.route("/taxis", methods=["GET"])
     @jwt_required()
@@ -102,25 +103,11 @@ def main():
         taxi_id = request.args.get("taxiId")
         date = request.args.get("date")
         email = request.args.get("email")
+        if not taxi_id or not date or not email:
+            return jsonify({"error": "Missing parameters"}), 400
         query_list = trajectories_with_plate(taxi_id, date)
-        # Convert list to xlsx
-        wb = Workbook()
-        ws = wb.active
-        row_title = list(query_list[0].keys()) # ["taxi_id", "plate", "latitude", "longitude", "date"]
-        ws.append(row_title)
-        for element in query_list:
-            row = list(element.values())
-            ws.append(row)
-        # Save the file to an in-memory buffer
-        output = io.BytesIO()
-        wb.save(output)
-        output.seek(0)
-        # Send email
-        msg = Message("Your Excel file is ready", sender=app.config['MAIL_USERNAME'], recipients=[email])
-        # msg.body = "Please find the attached Excel file."
-        msg.attach(f"locations-{taxi_id}-{date}.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", output.read())
-        mail.send(msg)
-        return jsonify({"msg": "The file requested has been sent"})
+        excel_file = list_to_excel(query_list)
+        return send_excel_email(email, excel_file, f"locations-{taxi_id}-{date}")
 
     return app
 

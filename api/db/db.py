@@ -1,4 +1,4 @@
-"""SQLAlchemy database instance"""
+"""Module for SQLAlchemy database instance"""
 
 from flask_sqlalchemy import SQLAlchemy
 
