@@ -16,8 +16,7 @@ def list_to_excel(lst):
     for element in lst:
         row = list(element.values())
         ws.append(row)
-    # Save the file to an in-memory buffer
-    file = io.BytesIO()
+    file = io.BytesIO() # Save the file to an in-memory buffer
     wb.save(file)
     file.seek(0)
     return file
@@ -25,8 +24,8 @@ def list_to_excel(lst):
 
 def send_excel_email(recipient, file, file_name):
     """Sends email with excel file attached"""
-    msg = Message("Your Excel file", recipients=[recipient])
-    msg.body = "Please find the attached Excel file."
+    msg = Message(subject="Your Excel file", recipients=[recipient])
+    msg.body = "The requested file is attached."
     msg.attach(
         f"{file_name}.xlsx",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

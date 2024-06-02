@@ -7,7 +7,7 @@ from api.controllers.taxis_controller import select_taxis
 from api.controllers.trajectories_controller import (
     select_trajectories,
     select_last_location,
-    trajectories_with_plate,
+    trajectories_with_plate
 )
 from api.controllers.users_controller import new_user, select_users, modify_user, delete_user
 from api.controllers.login import create_token
@@ -98,8 +98,9 @@ def main():
         return create_token(email, password)
 
     @app.route("/trajectories/export", methods=["GET"])
+    @jwt_required()
     def export_trajectories():
-        """Gets excel"""
+        """Gets excel file with the locations of a taxi and sends it via email"""
         taxi_id = request.args.get("taxiId")
         date = request.args.get("date")
         email = request.args.get("email")
