@@ -1,10 +1,28 @@
 """Functions for Excel files and sending emails"""
 
 import io
+from functools import wraps
 from flask import jsonify
+from flask_jwt_extended import verify_jwt_in_request
+from flask_jwt_extended.exceptions import NoAuthorizationError
 from flask_mail import Message
 from openpyxl import Workbook
 from .extensions import mail
+
+
+def token_required(fn):
+    """Decorator to verify a valid token is present in the request"""
+    @wraps(fn)
+    def decorator(*args, **kwargs):
+        try:
+            verify_jwt_in_request()
+        except NoAuthorizationError:
+            return jsonify({"error": "Token is missing"}), 401
+        # pylint: disable=bare-except
+        except:
+            return jsonify({"error": "Token is invalid or expired"}), 401
+        return fn(*args, **kwargs)
+    return decorator
 
 
 def list_to_excel(lst):

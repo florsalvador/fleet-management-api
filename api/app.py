@@ -13,7 +13,7 @@ from api.controllers.users_controller import new_user, select_users, modify_user
 from api.controllers.login import create_token
 from .config import Config
 from .extensions import bcrypt, mail
-from .utils import list_to_excel, send_excel_email
+from .utils import list_to_excel, send_excel_email, token_required
 
 
 def main():
@@ -64,7 +64,7 @@ def main():
         return new_user(name, email, hashed_password)
 
     @app.route("/users", methods=["GET"])
-    @jwt_required()
+    @token_required
     def get_users():
         """Gets list of users"""
         page = request.args.get("page", 1, type=int)

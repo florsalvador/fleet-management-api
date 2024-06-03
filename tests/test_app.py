@@ -170,10 +170,10 @@ def test_get_token_missing_info(client):
 
 
 @patch("flask_jwt_extended.view_decorators.verify_jwt_in_request", name="mock_jwt_required")
-@patch("api.app.send_excel_email", name="mock_send_excel_email", return_value=create_token_response)
+@patch("api.app.send_excel_email", name="mock_send_excel_email", return_value={"msg": "The file requested has been sent"})
 def test_export_trajectories(mock_send_excel_email, mock_jwt_required, client):
     """Test for export_trajectories"""
-    response = client.get("/trajectories/export?taxiId=7088&date=2008-02-02&email=email@gmail.com")
+    response = client.get("/trajectories/export?taxiId=7088&date=2008-02-02&email=example@gmail.com")
     assert mock_send_excel_email.called
     assert mock_jwt_required.called
     assert response.status_code == 200
@@ -189,5 +189,5 @@ def test_export_trajectories_missing_params(mock_jwt_required, client):
 
 def test_export_trajectories_no_token(client):
     """Test for export_trajectories to verify it returns a 401 error when unauthorized"""
-    response = client.get("/trajectories/export")
+    response = client.get("/trajectories/export?taxiId=7088&date=2008-02-02&email=example@gmail.com")
     assert response.status_code == 401
