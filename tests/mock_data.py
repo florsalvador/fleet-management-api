@@ -5,8 +5,9 @@ taxis_response = [
     {"id": 10133, "plate": "PAOF-6727"},
     {"id": 2210, "plate": "FGMG-3071"},
     {"id": 1065, "plate": "GHDN-9291"},
-    {"id": 7956, "plate": "CCKF-1601"},
+    {"id": 7956, "plate": "CCKF-1601"}
 ]
+
 
 locations_response = [
     {
@@ -14,23 +15,24 @@ locations_response = [
         "id": 1,
         "latitude": 116.30508,
         "longitude": 39.96525,
-        "taxi_id": 6418,
+        "taxi_id": 6418
     },
     {
         "date": "Sat, 02 Feb 2008 14:25:54 GMT",
         "id": 2,
         "latitude": 116.3043,
         "longitude": 39.9622,
-        "taxi_id": 6418,
+        "taxi_id": 6418
     },
     {
         "date": "Sat, 02 Feb 2008 14:30:55 GMT",
         "id": 3,
         "latitude": 116.32259,
         "longitude": 39.96596,
-        "taxi_id": 6418,
-    },
+        "taxi_id": 6418
+    }
 ]
+
 
 last_location_response = [
     {
@@ -38,13 +40,47 @@ last_location_response = [
         "latitude": 116.11806,
         "longitude": 39.72814,
         "plate": "PAOF-6727",
-        "taxi_id": 10133,
+        "taxi_id": 10133
     },
     {
         "date": "Fri, 08 Feb 2008 17:37:43 GMT",
         "latitude": 116.32706,
         "longitude": 39.84801,
         "plate": "FHLB-7962",
-        "taxi_id": 6598,
+        "taxi_id": 6598
     }
 ]
+
+
+new_user_response = {
+  "id": 15254,
+  "name": "Grace Hopper",
+  "email": "grace.hopper@systers.xyz"
+}
+
+
+users_response = [
+  {
+    "id": 15253,
+    "name": "Anita Borg",
+    "email": "anita.borg@systers.xyz"
+  },
+  {
+    "id": 15254,
+    "name": "Grace Hopper",
+    "email": "grace.hopper@systers.xyz"
+  }
+]
+
+
+update_user_response = {
+  "id": 15254,
+  "name": "Grace Hopper",
+  "email": "grace.hopper@email.com"
+}
+
+
+create_token_response = {
+  "accessToken": "access_token",
+  "user": {"id": 15253, "email": "anita.borg@systers.xyz"}
+}

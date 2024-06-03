@@ -1,26 +1,23 @@
-"""..."""
+"""Module controller for table trajectories"""
+
 from datetime import datetime
 from flask import jsonify
 from sqlalchemy import func
-from .db import db
-from .models import Taxis, Trajectories
-
-
-def select_taxis(page, limit):
-    """Returns list of taxis"""
-    taxis_query = Taxis.query.paginate(page=page, per_page=limit)
-    response = []
-    for taxi in taxis_query.items:
-        taxi_info = {"id": taxi.id, "plate": taxi.plate}
-        response.append(taxi_info)
-    return jsonify(response)
+from api.db.db import db
+from api.models.taxis import Taxis
+from api.models.trajectories import Trajectories
 
 
 def select_trajectories(taxi_id, date):
     """Returns all the locations of a taxi for a specific date"""
     if date:
-        date_to_use = datetime.strptime(date, "%Y-%m-%d").date()
-        trajectories_query = Trajectories.query.filter(Trajectories.taxi_id == taxi_id, func.date(Trajectories.date) == date_to_use).all()
+        try:
+            date_to_use = datetime.strptime(date, "%Y-%m-%d").date()
+        except ValueError:
+            return "<h1>Error</h1><p>Date entered does not match format YYYY-MM-DD. Try again.</p>"
+        trajectories_query = Trajectories.query.filter(
+            Trajectories.taxi_id == taxi_id, func.date(Trajectories.date) == date_to_use
+        ).all()
     else:
         trajectories_query = Trajectories.query.filter(Trajectories.taxi_id == taxi_id).all()
     response = []
@@ -53,3 +50,30 @@ def select_last_location():
         }
         response.append(last_location)
     return jsonify(response)
+
+
+def trajectories_with_plate(taxi_id, date):
+    """Returns list with all the locations of a taxi for a specific date (including plates)"""
+    try:
+        date_to_use = datetime.strptime(date, "%Y-%m-%d").date()
+    except ValueError:
+        return "<h1>Error</h1><p>Date entered does not match format YYYY-MM-DD. Try again.</p>"
+    trajectories_query = (
+        db.session.query(Trajectories, Taxis)
+        .filter(Trajectories.taxi_id == taxi_id, func.date(Trajectories.date) == date_to_use)
+        .join(Taxis, Trajectories.taxi_id == Taxis.id)
+        .all()
+    )
+    response = []
+    for element in trajectories_query:
+        trajectory = element[0]  # Trajectories object
+        taxi = element[1]  # Taxis object
+        locations = {
+            "taxi_id": trajectory.taxi_id,
+            "plate": taxi.plate,
+            "latitude": trajectory.latitude,
+            "longitude": trajectory.longitude,
+            "date": trajectory.date
+        }
+        response.append(locations)
+    return response
