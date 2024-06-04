@@ -4,11 +4,10 @@ import os
 import argparse
 import psycopg2
 
-
+# pylint: disable=line-too-long
 def query_taxis(taxi_id, plate):
     """Query to insert data into taxis table"""
     return f"INSERT INTO taxis (id, plate) VALUES ({taxi_id},'{plate}');"
-
 
 def query_trajectories(taxi_id, date, latitude, longitude):
     """Query to insert data into trajectories table"""
@@ -31,7 +30,7 @@ def insert_data(path, file_type, dbname, host, port, username):
                     queries = []
                     # reads every line of the file and creates a query for each one
                     for line in file:
-                        values = line.split(",") # turns "7249,CNCJ-2997" into ["7249", "CNCJ-2997"]
+                        values = line.strip().split(",") # turns "7249,CNCJ-2997" into ["7249", "CNCJ-2997"]
                         if file_type == "taxis":
                             query = query_taxis(*values)
                         if file_type == "trajectories":
