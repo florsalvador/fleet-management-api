@@ -4,7 +4,7 @@ from api.db.db import db
 
 
 class Taxis(db.Model):
-    """Class for table Taxis"""
+    """Class for table taxis"""
     __tablename__ = "taxis"
 
     id = db.Column(db.Integer, primary_key=True)
