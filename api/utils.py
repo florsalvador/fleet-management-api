@@ -27,17 +27,17 @@ def token_required(fn):
 
 def list_to_excel(lst):
     """Converts list to xlsx file"""
-    wb = Workbook()
-    ws = wb.active
+    excel = Workbook()
+    active_sheet = excel.active
     row_title = list(lst[0].keys()) # ["taxi_id", "plate", "latitude", "longitude", "date"]
-    ws.append(row_title)
+    active_sheet.append(row_title)
     for element in lst:
         row = list(element.values())
-        ws.append(row)
-    file = io.BytesIO() # Save the file to an in-memory buffer
-    wb.save(file)
-    file.seek(0)
-    return file
+        active_sheet.append(row)
+    buffer = io.BytesIO() # object in-memory buffer
+    excel.save(buffer) # saves the excel to the buffer
+    buffer.seek(0) # sets buffer's position to the beginning
+    return buffer
 
 
 def send_excel_email(recipient, file, file_name):

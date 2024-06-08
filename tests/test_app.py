@@ -11,15 +11,16 @@ from .mock_data import (
     create_token_response
 )
 
+# pylint: disable=line-too-long
 
-@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request", name="mock_jwt_required")
+@patch("api.utils.verify_jwt_in_request", name="mock_token_required")
 @patch("api.app.select_taxis", name="mock_select_taxis", return_value=taxis_response)
-def test_get_taxis(mock_select_taxis, mock_jwt_required, client):
+def test_get_taxis(mock_select_taxis, mock_token_required, client):
     """Test for get_taxis using a mock to verify the response"""
     response = client.get("/taxis")
     assert response.status_code == 200
     assert mock_select_taxis.called
-    assert mock_jwt_required.called
+    assert mock_token_required.called
     assert json.loads(response.get_data()) == taxis_response
 
 
@@ -29,51 +30,51 @@ def test_get_taxis_no_token(client):
     assert response.status_code == 401
 
 
-@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request", name="mock_jwt_required")
+@patch("api.utils.verify_jwt_in_request", name="mock_token_required")
 @patch("api.app.select_trajectories",
     name="mock_select_trajectories",
     return_value=locations_response)
-def test_get_trajectories_by_taxi(mock_select_trajectories, mock_jwt_required, client):
+def test_get_trajectories_by_taxi(mock_select_trajectories, mock_token_required, client):
     """Test for get_trajectories without date"""
     response = client.get("/trajectories?taxiId=6418")
     assert response.status_code == 200
     assert mock_select_trajectories.call_args.args == ("6418", None)
-    assert mock_jwt_required.called
+    assert mock_token_required.called
     assert json.loads(response.get_data()) == locations_response
 
 
-@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request", name="mock_jwt_required")
+@patch("api.utils.verify_jwt_in_request", name="mock_token_required")
 @patch("api.app.select_trajectories",
     name="mock_select_trajectories",
     return_value=locations_response)
-def test_get_trajectories_with_date(mock_select_trajectories, mock_jwt_required, client):
+def test_get_trajectories_with_date(mock_select_trajectories, mock_token_required, client):
     """Test for get_trajectories with date to verify status and length of data"""
     response = client.get("/trajectories?taxiId=6418&date=2008-02-02")
     assert response.status_code == 200
     assert mock_select_trajectories.call_args.args == ("6418", "2008-02-02")
-    assert mock_jwt_required.called
+    assert mock_token_required.called
     assert len(json.loads(response.get_data())) == 3
 
 
-@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request", name="mock_jwt_required")
+@patch("api.utils.verify_jwt_in_request", name="mock_token_required")
 @patch("api.app.select_last_location",
     name="mock_select_last_location",
     return_value=last_location_response)
-def test_get_last_location(mock_select_last_location, mock_jwt_required, client):
+def test_get_last_location(mock_select_last_location, mock_token_required, client):
     """Test for get_last_location to verify status, length of data and the existence of plate"""
     response = client.get("/trajectories/latest")
     data = json.loads(response.get_data())
     assert response.status_code == 200
     assert mock_select_last_location.called
-    assert mock_jwt_required.called
+    assert mock_token_required.called
     assert len(data) == 2
     for element in data:
         assert "plate" in element
 
 
-@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request", name="mock_jwt_required")
+@patch("api.utils.verify_jwt_in_request", name="mock_token_required")
 @patch("api.app.new_user", name="mock_new_user", return_value=new_user_response)
-def test_create_user(mock_new_user, mock_jwt_required, client):
+def test_create_user(mock_new_user, mock_token_required, client):
     """Test for create_user"""
     response = client.post(
         "/users",
@@ -85,7 +86,7 @@ def test_create_user(mock_new_user, mock_jwt_required, client):
     )
     assert response.status_code == 200
     assert mock_new_user.called
-    assert mock_jwt_required.called
+    assert mock_token_required.called
     assert json.loads(response.get_data()) == new_user_response
 
 
@@ -102,8 +103,8 @@ def test_create_user_no_token(client):
     assert response.status_code == 401
 
 
-@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request", name="mock_jwt_required")
-def test_create_user_missing_info(mock_jwt_required, client):
+@patch("api.utils.verify_jwt_in_request", name="mock_token_required")
+def test_create_user_missing_info(mock_token_required, client):
     """Test for create_user to verify it returns a 400 error when missing info"""
     response = client.post(
         "/users",
@@ -112,18 +113,19 @@ def test_create_user_missing_info(mock_jwt_required, client):
             "email": "grace.hopper@systers.xyz"
         }
     )
-    assert mock_jwt_required.called
+    assert mock_token_required.called
     assert response.status_code == 400
 
 
-@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request", name="mock_jwt_required")
+@patch("api.utils.verify_jwt_in_request", name="mock_token_required")
 @patch("api.app.select_users", name="mock_select_users", return_value=users_response)
-def test_get_users(mock_select_users, mock_jwt_required, client):
+def test_get_users(mock_select_users, mock_token_required, client):
     """Test for get_users"""
     response = client.get("/users")
     assert response.status_code == 200
+    assert json.loads(response.get_data()) == users_response
     assert mock_select_users.call_args.args == (1, 10)
-    assert mock_jwt_required.called
+    assert mock_token_required.called
 
 
 def test_update_user(client):
@@ -169,21 +171,21 @@ def test_get_token_missing_info(client):
     assert response.status_code == 400
 
 
-@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request", name="mock_jwt_required")
+@patch("api.utils.verify_jwt_in_request", name="mock_token_required")
 @patch("api.app.send_excel_email", name="mock_send_excel_email", return_value={"msg": "The file requested has been sent"})
-def test_export_trajectories(mock_send_excel_email, mock_jwt_required, client):
+def test_export_trajectories(mock_send_excel_email, mock_token_required, client):
     """Test for export_trajectories"""
     response = client.get("/trajectories/export?taxiId=7088&date=2008-02-02&email=example@gmail.com")
     assert mock_send_excel_email.called
-    assert mock_jwt_required.called
+    assert mock_token_required.called
     assert response.status_code == 200
 
 
-@patch("flask_jwt_extended.view_decorators.verify_jwt_in_request", name="mock_jwt_required")
-def test_export_trajectories_missing_params(mock_jwt_required, client):
+@patch("api.utils.verify_jwt_in_request", name="mock_token_required")
+def test_export_trajectories_missing_params(mock_token_required, client):
     """Test for export_trajectories to verify that the required parameteres are present"""
     response = client.get("/trajectories/export")
-    assert mock_jwt_required.called
+    assert mock_token_required.called
     assert response.status_code == 400
 
 
