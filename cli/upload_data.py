@@ -22,7 +22,7 @@ def query_taxis(taxi_id, plate):
 
 def query_trajectories(taxi_id, date, latitude, longitude):
     """Query to insert data into trajectories table"""
-    return f"INSERT INTO trajectories (taxi_id, date, latitude, longitude) VALUES ({taxi_id}, '{date}',{latitude},{longitude});"
+    return f"INSERT INTO trajectories (taxi_id, date, latitude, longitude) VALUES ({taxi_id},'{date}',{latitude},{longitude});"
 
 
 def get_queries(file_type, file):
@@ -38,22 +38,26 @@ def get_queries(file_type, file):
     return queries
 
 
+def process_file(file_path, file_type, file_name, conn):
+    """Opens file, creates query for each file and executes"""
+    with open(file_path, "r", encoding="utf-8") as file:
+        queries = get_queries(file_type, file)
+        # if queries is not empty, the data is inserted
+        if queries:
+            cur = conn.cursor()
+            cur.execute(" ".join(queries))
+            conn.commit()
+            print(f"Done with file {file_name}")
+
+
 def insert_data(path, file_type, dbname, host, port, username):
     """Connects to database, reads the files and inserts data into the table"""
     conn = connect_db(dbname, host, port, username)
     with os.scandir(path) as entries:
         for entry in entries:
             if entry.is_file():
-                file_name = entry.name
-                file_path = f"{path}/{file_name}"
-                with open(file_path, "r", encoding="utf-8") as file:
-                    queries = get_queries(file_type, file)
-                    # if queries is not empty, the data is inserted
-                    if queries:
-                        cur = conn.cursor()
-                        cur.execute(" ".join(queries))
-                        conn.commit()
-                        print(f"Done with file {file_name}")
+                file_path = f"{path}/{entry.name}"
+                process_file(file_path, file_type, entry.name, conn)
     conn.close()
 
 

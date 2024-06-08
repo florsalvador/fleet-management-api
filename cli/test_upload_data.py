@@ -1,11 +1,19 @@
 """Tests for upload_data.py"""
 
-from .upload_data import query_taxis, get_queries
+from .upload_data import query_taxis, query_trajectories, get_queries
 
 def test_query_taxis():
     """Test for query_taxis"""
-    query = query_taxis(*["7249", "CNCJ-2997"])
-    assert isinstance(query, str)
+    line_list = ["7249", "CNCJ-2997"]
+    query = query_taxis(*line_list)
+    assert query == "INSERT INTO taxis (id, plate) VALUES (7249,'CNCJ-2997');"
+
+
+def test_query_trajectories():
+    """Test for query_trajectories"""
+    line_list = ["2749", "2008-02-02 20:40:39", "116.45019", "39.86295"]
+    query = query_trajectories(*line_list)
+    assert query == "INSERT INTO trajectories (taxi_id, date, latitude, longitude) VALUES (2749,'2008-02-02 20:40:39',116.45019,39.86295);"
 
 
 def test_get_queries():
